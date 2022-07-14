@@ -15,7 +15,7 @@ help:
 .DEFAULT_GOAL := help
 
 .PHONY: install-deps-dev
-install-deps-dev: install-deps-protoc install-deps-grpc-go ## install dependencies for development
+install-deps-dev: ## install dependencies for development
 	@# https://github.com/spf13/cobra-cli/blob/main/README.md
 	which cobra-cli || go install github.com/spf13/cobra-cli@latest
 	@# https://golangci-lint.run/usage/install/#linux-and-windows
