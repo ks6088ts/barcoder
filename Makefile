@@ -40,6 +40,7 @@ build: ## build
 .PHONY: test-run
 test-run: ## tests for running cli
 	./dist/barcoder --help
+	./dist/barcoder code2img --help
 
 .PHONY: ci-test
 ci-test: install-deps-dev lint test build test-run ## run ci tests

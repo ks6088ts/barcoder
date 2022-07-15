@@ -22,36 +22,69 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"fmt"
+	"image/png"
+	"log"
+	"os"
 
 	"github.com/spf13/cobra"
+
+	"github.com/boombuler/barcode"
+	"github.com/boombuler/barcode/qr"
 )
 
 // code2imgCmd represents the code2img command
 var code2imgCmd = &cobra.Command{
 	Use:   "code2img",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "code2img",
+	Long:  `generate image from code`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("code2img called")
+		code, err := cmd.Flags().GetString("code")
+		if err != nil {
+			log.Fatalf("failed to parse `code`: %v", err)
+		}
+		width, err := cmd.Flags().GetInt("width")
+		if err != nil {
+			log.Fatalf("failed to parse `width`: %v", err)
+		}
+		height, err := cmd.Flags().GetInt("height")
+		if err != nil {
+			log.Fatalf("failed to parse `height`: %v", err)
+		}
+		output, err := cmd.Flags().GetString("output")
+		if err != nil {
+			log.Fatalf("failed to parse `output`: %v", err)
+		}
+
+		// Create the QR code
+		qrCode, err := qr.Encode(code, qr.M, qr.Auto)
+		if err != nil {
+			log.Fatalf("failed to crate a QR code: %v", err)
+		}
+
+		qrCode, err = barcode.Scale(qrCode, width, height)
+		if err != nil {
+			log.Fatalf("failed to scale a QR barcode: %v", err)
+		}
+
+		// create the output file
+		file, err := os.Create(output)
+		if err != nil {
+			log.Fatalf("failed to create an output file: %v", err)
+		}
+		defer file.Close()
+
+		// encode the barcode as png
+		if err = png.Encode(file, qrCode); err != nil {
+			log.Fatalf("failed to encode the barcode as png: %v", err)
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(code2imgCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// code2imgCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// code2imgCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	code2imgCmd.Flags().StringP("code", "c", "code", "code2img")
+	code2imgCmd.Flags().IntP("width", "w", 200, "width of output image")
+	code2imgCmd.Flags().IntP("height", "e", 200, "height of output image")
+	code2imgCmd.Flags().StringP("output", "o", "qrcode.png", "path to output image")
 }
