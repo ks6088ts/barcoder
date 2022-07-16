@@ -40,32 +40,46 @@ import (
 	"github.com/boombuler/barcode/twooffive"
 )
 
-func createBarcode(barcodeType string, code string) (barcode.Barcode, error) {
-	if barcodeType == "codabar" {
+type barcodeType string
+
+const (
+	barcodeTypeCodabar    = barcodeType("codabar")
+	barcodeTypeCode128    = barcodeType("code128")
+	barcodeTypeCode39     = barcodeType("code39")
+	barcodeTypeCode93     = barcodeType("code93")
+	barcodeTypeDatamatrix = barcodeType("datamatrix")
+	barcodeTypeEan        = barcodeType("ean")
+	barcodeTypeQr         = barcodeType("qr")
+	barcodeTypeTwooffive  = barcodeType("twooffive")
+)
+
+func createBarcode(bts string, code string) (barcode.Barcode, error) {
+	bt := barcodeType(bts)
+	if bt == barcodeTypeCodabar {
 		return codabar.Encode(code)
 	}
-	if barcodeType == "code128" {
+	if bt == barcodeTypeCode128 {
 		return code128.Encode(code)
 	}
-	if barcodeType == "code39" {
+	if bt == barcodeTypeCode39 {
 		return code39.Encode(code, true, true)
 	}
-	if barcodeType == "code93" {
+	if bt == barcodeTypeCode93 {
 		return code93.Encode(code, true, true)
 	}
-	if barcodeType == "datamatrix" {
+	if bt == barcodeTypeDatamatrix {
 		return datamatrix.Encode(code)
 	}
-	if barcodeType == "ean" {
+	if bt == barcodeTypeEan {
 		return ean.Encode(code)
 	}
-	if barcodeType == "qr" {
+	if bt == barcodeTypeQr {
 		return qr.Encode(code, qr.M, qr.Auto)
 	}
-	if barcodeType == "twooffive" {
+	if bt == barcodeTypeTwooffive {
 		return twooffive.Encode(code, true)
 	}
-	return nil, fmt.Errorf("barcode type %s is not supported", barcodeType)
+	return nil, fmt.Errorf("barcode type %s is not supported", bt)
 }
 
 // code2imgCmd represents the code2img command
@@ -90,12 +104,12 @@ var code2imgCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("failed to parse `output`: %v", err)
 		}
-		barcodeType, err := cmd.Flags().GetString("type")
+		bts, err := cmd.Flags().GetString("type")
 		if err != nil {
 			log.Fatalf("failed to parse `type`: %v", err)
 		}
 
-		b, err := createBarcode(barcodeType, code)
+		b, err := createBarcode(bts, code)
 		if err != nil {
 			log.Fatalf("failed to crate a barcode: %v", err)
 		}
