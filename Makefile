@@ -38,9 +38,17 @@ build: ## build
 	$(GOBUILD) -ldflags=$(LDFLAGS) -o dist/barcoder .
 
 .PHONY: test-run
-test-run: ## tests for running cli
-	./dist/barcoder --help
-	./dist/barcoder code2img --help
+test-run: test-run-code2img ## run test
+
+.PHONY: test-run-code2img
+test-run-code2img: ## run test for code2img command (todo: binary comparison)
+	rm -rf generated/images && mkdir -p generated/images
+	for type in code128 code39 code93 datamatrix qr ; do \
+			./dist/barcoder code2img --width 250 --height 200 --type $$type --output generated/images/$$type-test.png --code test ; \
+	done
+	./dist/barcoder code2img --width 250 --height 200 --type codabar   --output generated/images/codabar-A123456789D.png --code A123456789D
+	./dist/barcoder code2img --width 250 --height 200 --type ean       --output generated/images/ean-4581171967072.png   --code 4581171967072
+	./dist/barcoder code2img --width 250 --height 200 --type twooffive --output generated/images/twooffive-1234.png      --code 1234
 
 .PHONY: ci-test
 ci-test: install-deps-dev lint test build test-run ## run ci tests

@@ -19,13 +19,15 @@ Flags:
   -c, --code string     code2img (default "code")
   -e, --height int      height of output image (default 200)
   -h, --help            help for code2img
-  -o, --output string   path to output image (default "qrcode.png")
+  -o, --output string   path to output image (default "qr.png")
+  -t, --type string     barcode type (codabar|code128|code39|code93|datamatrix|ean|qr|twooffive) (default "qr")
   -w, --width int       width of output image (default 200)
 
-# Generate `hello` QR code to dist/hello.png
+# Generate `hello` QR code to generated/hello.png
 ❯ ./dist/barcoder code2img \
   --code hello \
-  --output dist/hello.png \
+  --output generated/hello.png \
   --height 200 \
-  --width 200
+  --width 200 \
+  --type qr
 ```
