@@ -1,3 +1,6 @@
+GIT_REVISION ?= $(shell git rev-parse --short HEAD)
+GIT_TAG ?= $(shell git describe --tags $$(git rev-list --tags --max-count=1))
+
 GOOS ?= $(shell go env GOOS)
 GOARCH ?= $(shell go env GOARCH)
 GOPATH ?= $(shell go env GOPATH)
@@ -5,8 +8,8 @@ GOBUILD ?= GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=0 go build
 GOFILES ?= $(shell find . -name "*.go")
 GOLANGCI_LINT_VERSION ?= 1.45.2
 LDFLAGS ?= '-s -w \
-	-X "github.com/ks6088ts/barcoder/internal.Revision=$(shell git rev-parse --short HEAD)" \
-	-X "github.com/ks6088ts/barcoder/internal.Version=$(shell git describe --tags $$(git rev-list --tags --max-count=1))" \
+	-X "github.com/ks6088ts/barcoder/internal.Revision=$(GIT_REVISION)" \
+	-X "github.com/ks6088ts/barcoder/internal.Version=$(GIT_TAG)" \
 '
 
 .PHONY: help
@@ -52,3 +55,13 @@ test-run-code2img: ## run test for code2img command (todo: binary comparison)
 
 .PHONY: ci-test
 ci-test: install-deps-dev lint test build test-run ## run ci tests
+
+.PHONY: docker-build
+docker-build: ## build Docker image
+	docker build -t ks6088ts/barcoder:$(GIT_TAG) .
+
+.PHONY: docker-terminal
+docker-terminal: ## run container on terminal
+	docker run --rm -it \
+		--volume $(PWD)/generated:/root/generated \
+		ks6088ts/barcoder:$(GIT_TAG) sh
