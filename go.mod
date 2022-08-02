@@ -1,6 +1,6 @@
 module github.com/ks6088ts/barcoder
 
-go 1.18
+go 1.19
 
 require (
 	github.com/boombuler/barcode v1.0.1
