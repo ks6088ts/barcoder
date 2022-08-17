@@ -11,6 +11,8 @@ LDFLAGS ?= '-s -w \
 	-X "github.com/ks6088ts/barcoder/internal.Revision=$(GIT_REVISION)" \
 	-X "github.com/ks6088ts/barcoder/internal.Version=$(GIT_TAG)" \
 '
+CSV_FILE ?= data/code_list.csv
+GENERATED_DIR ?= ./generated
 
 .PHONY: help
 help:
@@ -65,3 +67,22 @@ docker-terminal: ## run container on terminal
 	docker run --rm -it \
 		--volume $(PWD)/generated:/root/generated \
 		ks6088ts/barcoder:$(GIT_TAG) sh
+
+.PHONY: generate-image
+generate-image: ## generate image files
+	rm -rf $(GENERATED_DIR)
+	mkdir -p $(GENERATED_DIR)
+	cat $(CSV_FILE) | xargs -I {} -P3 ./dist/barcoder code2img \
+		--height 100 \
+		--width 500 \
+		--type code128 \
+		--output $(GENERATED_DIR)/{}.png \
+		--code {}
+
+.PHONY: generate-markdown
+generate-markdown: ## generate markdown file
+	@cd generated && ls *.png | xargs -I {} echo "{} <img src='./{}' width='100%'>"
+
+.PHONY: generate
+generate: generate-image ## generate
+	@make generate-markdown > "$(GENERATED_DIR)/sheet.md"
