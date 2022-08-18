@@ -14,7 +14,13 @@ builds:
       - windows
       - darwin
 archives:
-  - replacements:
+  - wrap_in_directory: true
+    files:
+      - LICENSE
+      - README.md
+      - data/code_list.csv
+      - scripts/run.bat
+    replacements:
       darwin: Darwin
       linux: Linux
       windows: Windows
