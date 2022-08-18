@@ -18,8 +18,8 @@ archives:
     files:
       - LICENSE
       - README.md
-      - data/code_list.csv
-      - scripts/run.bat
+      - code_list.csv
+      - run.bat
     replacements:
       darwin: Darwin
       linux: Linux
