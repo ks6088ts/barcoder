@@ -1,6 +1,6 @@
 # https://docs.docker.com/develop/develop-images/multistage-build/#name-your-build-stages
 
-FROM golang:1.18 AS builder
+FROM golang:1.22 AS builder
 WORKDIR /go/src/github.com/ks6088ts/barcoder/
 COPY . .
 RUN make build GOOS=linux
